@@ -20,9 +20,7 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   TextEditingController messageController = TextEditingController();
   List<Message> messages = [];
-  final String apiKey = 'git remote add origin https://github.com/JUNIOR-G05/Miabesante.git
-  git branch -M main
-  git push -u origin main';
+  final String apiKey = '';
 
   Future<void> sendMessage(String message) async {
     setState(() {
