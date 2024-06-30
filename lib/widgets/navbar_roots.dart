@@ -16,8 +16,7 @@ class _NavBarRootsState extends State<NavBarRoots> {
   final _screens = [
     HomeScreen(),
     MessagesScreen(),
-    //Container(),
-     ScheduleScreen(),
+    ScheduleScreen(),
     SettingScreen(),
 
   ];

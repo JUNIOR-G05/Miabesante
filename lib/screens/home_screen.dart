@@ -91,10 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 InkWell(
                   onTap: () {},
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       color: Color(0xFF7165D6),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(7),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12,
@@ -148,10 +148,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(7),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12,
