@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miabesante/screens/signup_screen.dart';
 import 'package:miabesante/widgets/navbar_roots.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,14 +11,45 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool passToggle = true;
 
-  void showSnackbar(BuildContext context, String message) {
+  void showSnackbar(BuildContext context, String message, Color color) {
     final snackBar = SnackBar(
       content: Text(message),
-      backgroundColor: Colors.green,
+      backgroundColor: color,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<void> _saveUserData(String userId, String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+    await prefs.setString('email', email);
+  }
+
+  Future<void> _login() async {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: _emailController.text)
+        .where('mdp', isEqualTo: _passwordController.text)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userDoc = querySnapshot.docs.first;
+      await _saveUserData(userDoc.id, userDoc['email']);
+      showSnackbar(context, "Connexion réussie", Colors.green);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NavBarRoots(),
+        ),
+      );
+    } else {
+      showSnackbar(context, "Échec de la connexion", Colors.red);
+    }
   }
 
   @override
@@ -39,9 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: "Entrez Nom d'utilisateur",
+                      labelText: "Entrez Email",
                       prefixIcon: Icon(Icons.person),
                     ),
                   ),
@@ -49,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: TextField(
+                    controller: _passwordController,
                     obscureText: passToggle,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -74,12 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.all(15),
                   child: InkWell(
                     onTap: () {
-                      showSnackbar(context, "Connexion réussie");
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NavBarRoots(),
-                          ));
+                      _login();
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 15),
@@ -123,10 +153,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
-                            ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
+                        );
                       },
                       child: Text(
                         "Créer un Compte",

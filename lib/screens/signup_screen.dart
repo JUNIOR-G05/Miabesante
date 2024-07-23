@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:miabesante/models/user_model.dart';
 import 'package:miabesante/screens/login_screen.dart';
+import 'package:miabesante/services/user_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -8,6 +10,12 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final UserService _userService = UserService();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _telController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool passToggle = true;
 
   void showSnackbar(BuildContext context, String message) {
@@ -16,6 +24,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.green,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _register() async {
+    UserModel user = UserModel(
+      nom: _nameController.text,
+      email: _emailController.text,
+      tel: _telController.text,
+      mdp: _passwordController.text,
+    );
+
+    await _userService.register(user);
+    showSnackbar(context, "Inscription réussie");
   }
 
   @override
@@ -38,6 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 13),
                   child: TextField(
+                    controller: _nameController,
                     decoration: InputDecoration(
                       labelText: "Nom Complet",
                       border: OutlineInputBorder(),
@@ -48,8 +69,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 13),
                   child: TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: " Email",
+                      labelText: "Email",
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.email),
                     ),
@@ -58,17 +80,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 13),
                   child: TextField(
+                    controller: _telController,
                     decoration: InputDecoration(
-                      labelText: "  Numéro de téléphone",
+                      labelText: "Numéro de téléphone",
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.phone),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 5, horizontal: 13),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
                   child: TextField(
+                    controller: _passwordController,
                     obscureText: passToggle,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -92,7 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: 20),
                 InkWell(
                   onTap: () {
-                    showSnackbar(context, "Inscription réussie");
+                    _register();
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12),
@@ -134,10 +158,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginScreen(),
-                            ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                        );
                       },
                       child: Text(
                         "Connexion",
