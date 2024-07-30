@@ -3,6 +3,7 @@ class UserModel {
   String nom;
   String email;
   String tel;
+  String role;
   String mdp;
 
   UserModel({
@@ -10,27 +11,30 @@ class UserModel {
     required this.nom,
     required this.email,
     required this.tel,
+    required this.role,
     required this.mdp,
   });
 
-  // Convert a UserModel object into a Map object
+  // Convertit un objet UserModel en un Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nom': nom,
       'email': email,
       'tel': tel,
+      'role': role,
       'mdp': mdp,
     };
   }
 
-  // Convert a Map object into a UserModel object
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  // Convertit un Map en un objet UserModel
+  factory UserModel.fromMap(Map<String, dynamic> map, String id) {
     return UserModel(
-      id: map['id'],
+      id: id,
       nom: map['nom'],
       email: map['email'],
       tel: map['tel'],
+      role: map['role'],
       mdp: map['mdp'],
     );
   }

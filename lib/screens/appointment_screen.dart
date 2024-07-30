@@ -1,13 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:miabesante/models/rdv_model.dart';
+import 'package:miabesante/models/user_model.dart';
+import 'package:miabesante/services/rdv_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AppointmentScreen extends StatelessWidget {
+class AppointmentScreen extends StatefulWidget {
+  final UserModel doctor;
+
+  const AppointmentScreen({Key? key, required this.doctor}) : super(key: key);
+
+  @override
+  State<AppointmentScreen> createState() => _AppointmentScreenState();
+}
+
+class _AppointmentScreenState extends State<AppointmentScreen> {
   List imgs = [
     "doctor1.jpg",
     "doctor2.jpg",
     "doctor3.jpg",
     "doctor4.jpg",
   ];
+  final RdvService _rdvService = RdvService();
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +66,7 @@ class AppointmentScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 15),
                         Text(
-                          "Dr. Docker",
+                          widget.doctor.nom,
                           style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.w500,
@@ -197,7 +211,7 @@ class AppointmentScreen extends StatelessWidget {
                                   leading: CircleAvatar(
                                     radius: 25,
                                     backgroundImage:
-                                    AssetImage("images/${imgs[index]}"),
+                                        AssetImage("images/${imgs[index]}"),
                                   ),
                                   title: Text(
                                     "Dr. Docker",
@@ -314,7 +328,9 @@ class AppointmentScreen extends StatelessWidget {
             ),
             SizedBox(height: 15),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                _showCreateRdvDialog(context);
+              },
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -338,5 +354,125 @@ class AppointmentScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showCreateRdvDialog(BuildContext context) async {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController causeController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    final TextEditingController heureController = TextEditingController();
+    final TextEditingController lieuController = TextEditingController();
+    final TextEditingController nomPatientController = TextEditingController();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String patientId = prefs.getString('userId') ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Créer un RDV"),
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: causeController,
+                    decoration: InputDecoration(labelText: "Cause"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer la cause";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: dateController,
+                    decoration: InputDecoration(labelText: "Date"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer la date";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: heureController,
+                    decoration: InputDecoration(labelText: "Heure"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer l'heure";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: lieuController,
+                    decoration: InputDecoration(labelText: "Lieu"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer le lieu";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: nomPatientController,
+                    decoration: InputDecoration(labelText: "Nom du Patient"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer le nom du patient";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Annuler"),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  RdvModel newRdv = RdvModel(
+                      id: '',
+                      cause: causeController.text,
+                      docteurId: widget.doctor.id!,
+                      date: dateController.text,
+                      heure: heureController.text,
+                      lieu: lieuController.text,
+                      nomPatient: nomPatientController.text,
+                      patientId: patientId);
+                  try {
+                    await _rdvService.createRdv(newRdv);
+                    Navigator.pop(context);
+                    _showSnackbar(
+                        context, "RDV créé avec succès", Colors.green);
+                  } catch (e) {
+                    _showSnackbar(context, "Erreur lors de la création du RDV",
+                        Colors.red);
+                  }
+                }
+              },
+              child: Text("Créer"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSnackbar(BuildContext context, String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

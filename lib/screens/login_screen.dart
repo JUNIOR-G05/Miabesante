@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:miabesante/models/user_model.dart';
+import 'package:miabesante/screens/admin_screen.dart';
 import 'package:miabesante/screens/signup_screen.dart';
+import 'package:miabesante/services/user_service.dart';
 import 'package:miabesante/widgets/navbar_roots.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool passToggle = true;
+
+  final UserService _userService = UserService();
 
   void showSnackbar(BuildContext context, String message, Color color) {
     final snackBar = SnackBar(
@@ -31,22 +36,30 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    QuerySnapshot querySnapshot = await _firestore
-        .collection('users')
-        .where('email', isEqualTo: _emailController.text)
-        .where('mdp', isEqualTo: _passwordController.text)
-        .get();
+    UserModel? user = await _userService.login(
+        _emailController.text, _passwordController.text);
 
-    if (querySnapshot.docs.isNotEmpty) {
-      var userDoc = querySnapshot.docs.first;
-      await _saveUserData(userDoc.id, userDoc['email']);
-      showSnackbar(context, "Connexion réussie", Colors.green);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => NavBarRoots(),
-        ),
+    if (user != null) {
+      await _saveUserData(
+        user.id!,
+        user.email,
       );
+      showSnackbar(context, "Connexion réussie", Colors.green);
+      if (user.role == 'DOCTEUR') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Admin(),
+          ),
+        );
+      } else if (user.role == 'PATIENT') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NavBarRoots(),
+          ),
+        );
+      }
     } else {
       showSnackbar(context, "Échec de la connexion", Colors.red);
     }

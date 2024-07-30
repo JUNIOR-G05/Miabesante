@@ -32,6 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       email: _emailController.text,
       tel: _telController.text,
       mdp: _passwordController.text,
+      role:"PATIENT"
     );
 
     await _userService.register(user);

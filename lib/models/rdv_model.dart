@@ -3,10 +3,11 @@ class RdvModel {
   String id;
   String cause;
   String docteurId;
-  String date;
-  String heure;
+  String date; // Date en format String
+  String heure; // Heure en format String
   String lieu;
-  String nomPatient;
+  String patientId; // Identifiant du patient
+  String nomPatient; // Nom du patient
 
   RdvModel({
     required this.id,
@@ -15,6 +16,7 @@ class RdvModel {
     required this.date,
     required this.heure,
     required this.lieu,
+    required this.patientId,
     required this.nomPatient,
   });
 
@@ -27,7 +29,8 @@ class RdvModel {
       'date': date,
       'heure': heure,
       'lieu': lieu,
-      'nom_patient': nomPatient,
+      'patient_id': patientId, // Identifiant du patient
+      'nom_patient': nomPatient, // Nom du patient
     };
   }
 
@@ -35,12 +38,13 @@ class RdvModel {
   factory RdvModel.fromMap(Map<String, dynamic> map, String id) {
     return RdvModel(
       id: id,
-      cause: map['cause'],
-      docteurId: map['docteur_id'],
-      date: map['date'],
-      heure: map['heure'],
-      lieu: map['lieu'],
-      nomPatient: map['nom_patient'],
+      cause: map['cause'] ?? '',
+      docteurId: map['docteur_id'] ?? '',
+      date: map['date'] ?? '',
+      heure: map['heure'] ?? '',
+      lieu: map['lieu'] ?? '',
+      patientId: map['patient_id'] ?? '', // Identifiant du patient
+      nomPatient: map['nom_patient'] ?? '', // Nom du patient
     );
   }
 }

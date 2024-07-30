@@ -19,7 +19,6 @@ class _NavBarRootsState extends State<NavBarRoots> {
     MessagesScreen(),
     ScheduleScreen(),
     SettingScreen(),
-    Admin(),
   ];
 
   @override
@@ -56,8 +55,6 @@ class _NavBarRootsState extends State<NavBarRoots> {
                 icon: Icon(Icons.calendar_month_outlined), label: "Calendrier"),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), label: "Paramètres"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.admin_panel_settings), label: "admin"),
           ],
         ),
       ),
