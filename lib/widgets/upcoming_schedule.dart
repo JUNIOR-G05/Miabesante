@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UpcomingSchedule extends StatelessWidget {
+import '../models/rdv_model.dart';
+import '../services/rdv_service.dart';
+
+class UpcomingSchedule extends StatefulWidget {
+  const UpcomingSchedule({super.key});
+
+  @override
+  State<UpcomingSchedule> createState() => _RdvClient();
+
+
+}
+
+class _RdvClient extends State<UpcomingSchedule> {
+  final RdvService _rdvService = RdvService();
+  late Future<String> _docteurIdFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _docteurIdFuture = _getDocteurId();
+  }
+
+  Future<String> _getDocteurId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId') ?? '';
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -460,5 +488,117 @@ class UpcomingSchedule extends StatelessWidget {
         ],
       ),
     );
+   /* return Scaffold(
+      appBar: AppBar(
+        title: Text("RDV"),
+      ),
+      body: FutureBuilder<String>(
+        future: _docteurIdFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError || !snapshot.hasData) {
+            return Center(
+                child: Text("Erreur de chargement de l'ID du docteur"));
+          }
+          String docteurId = snapshot.data!;
+          return StreamBuilder<List<RdvModel>>(
+            stream: _rdvService.getRdvsByDocteurId(docteurId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text("Erreur de chargement des RDV"));
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text("Aucun RDV trouvé"));
+              }
+              List<RdvModel> rdvs = snapshot.data!;
+              return ListView.builder(
+                itemCount: rdvs.length,
+                itemBuilder: (context, index) {
+                  RdvModel rdv = rdvs[index];
+                  return Card(
+                    margin: EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: Text("${rdv.nomPatient} - ${rdv.cause}"),
+                      subtitle:
+                      Text("${rdv.date} à ${rdv.heure} - ${rdv.lieu}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                            onPressed: (
+
+                                ) {
+                              // _showEditRdvDialog(context, rdv);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              bool? confirm = await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Confirmer la suppression"),
+                                    content: Text(
+                                        "Êtes-vous sûr de vouloir supprimer ce RDV ?"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: Text("Annuler"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: Text("Supprimer"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              if (confirm == true) {
+                                try {
+                                  await _rdvService.deleteRdv(rdv.id);
+                                  _showSnackbar(context,
+                                      "RDV supprimé avec succès", Colors.green);
+                                } catch (e) {
+                                  _showSnackbar(
+                                      context,
+                                      "Erreur lors de la suppression du RDV",
+                                      Colors.red);
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // _showCreateRdvDialog(context),
+        },
+        child: Icon(Icons.add),
+      ),
+    );*/
+  }
+  void _showSnackbar(BuildContext context, String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

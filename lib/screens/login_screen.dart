@@ -29,10 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<void> _saveUserData(String userId, String email) async {
+  Future<void> _saveUserData(String userId, String email, String nom) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userId', userId);
     await prefs.setString('email', email);
+    await prefs.setString('nom', nom);
   }
 
   Future<void> _login() async {
@@ -43,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await _saveUserData(
         user.id!,
         user.email,
+        user.nom
       );
       showSnackbar(context, "Connexion réussie", Colors.green);
       if (user.role == 'DOCTEUR') {

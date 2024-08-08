@@ -27,6 +27,7 @@ class UserService {
 
       if (querySnapshot.docs.isNotEmpty) {
         var userDoc = querySnapshot.docs.first;
+
         return UserModel.fromMap(
             userDoc.data() as Map<String, dynamic>, userDoc.id);
       } else {

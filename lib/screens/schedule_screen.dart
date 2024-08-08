@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/upcoming_schedule.dart';
-import '../widgets/completed_schedule.dart';
+// import '../widgets/completed_schedule.dart';
 // import '../widgets/cancelled_schedule.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -13,7 +13,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   final List<Widget> _scheduleWidgets = [
     UpcomingSchedule(),
-    CompletedSchedule(),
+    // CompletedSchedule(),
     // CancelledSchedule(),
   ];
 
@@ -65,7 +65,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       ),
                     ),
                   ),
-                  InkWell(
+                  /*InkWell(
                     onTap: () {
                       setState(() {
                         _buttonIndex = 1;
@@ -118,7 +118,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

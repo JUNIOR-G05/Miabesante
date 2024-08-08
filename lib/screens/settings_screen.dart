@@ -1,7 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingScreen extends StatelessWidget {
+
+  Future<String?> _getUserNom() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('nom');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -17,20 +24,36 @@ class SettingScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 30),
-          ListTile(
-            leading: CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage("images/doctor1.jpg"),
-            ),
-            title: Text(
-              "Cher Docteur",
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 25,
-              ),
-            ),
-            subtitle: Text("Profil"),
+
+          // Utilisation de FutureBuilder pour obtenir le nom de l'utilisateur
+          FutureBuilder<String?>(
+            future: _getUserNom(),
+            builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Affiche un indicateur de chargement
+              } else if (snapshot.hasError) {
+                return Text('Erreur: ${snapshot.error}'); // Affiche une erreur
+              } else {
+                // Utilise la valeur récupérée (ou un texte par défaut si null)
+                String nom = snapshot.data ?? 'Nom inconnu';
+                return ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage("images/doctor1.jpg"),
+                  ),
+                  title: Text(
+                    nom,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 25,
+                    ),
+                  ),
+                  subtitle: Text("Profil"),
+                );
+              }
+            },
           ),
+
           Divider(height: 50),
           ListTile(
             onTap: () {},
@@ -180,4 +203,3 @@ class SettingScreen extends StatelessWidget {
     );
   }
 }
-
