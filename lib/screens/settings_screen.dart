@@ -2,11 +2,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingScreen extends StatelessWidget {
+// Remplacez cette importation par l'import de votre page de connexion
+import 'login_screen.dart'; // Assurez-vous que ce chemin est correct.
 
+class SettingScreen extends StatelessWidget {
   Future<String?> _getUserNom() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('nom');
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    // Efface les données de l'utilisateur (ex: nom)
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    // Redirige vers la page de connexion
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
   @override
@@ -25,16 +39,14 @@ class SettingScreen extends StatelessWidget {
           ),
           SizedBox(height: 30),
 
-          // Utilisation de FutureBuilder pour obtenir le nom de l'utilisateur
           FutureBuilder<String?>(
             future: _getUserNom(),
             builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Affiche un indicateur de chargement
+                return CircularProgressIndicator();
               } else if (snapshot.hasError) {
-                return Text('Erreur: ${snapshot.error}'); // Affiche une erreur
+                return Text('Erreur: ${snapshot.error}');
               } else {
-                // Utilise la valeur récupérée (ou un texte par défaut si null)
                 String nom = snapshot.data ?? 'Nom inconnu';
                 return ListTile(
                   leading: CircleAvatar(
@@ -176,7 +188,7 @@ class SettingScreen extends StatelessWidget {
           ),
           Divider(height: 40),
           ListTile(
-            onTap: () {},
+            onTap: () => _logout(context), // Redirection lors de la déconnexion
             leading: Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(

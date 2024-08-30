@@ -4,6 +4,7 @@ import 'package:miabesante/models/rdv_model.dart';
 import 'package:miabesante/models/user_model.dart';
 import 'package:miabesante/services/rdv_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart'; // Ajouté
 
 class AppointmentScreen extends StatefulWidget {
   final UserModel doctor;
@@ -211,7 +212,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                   leading: CircleAvatar(
                                     radius: 25,
                                     backgroundImage:
-                                        AssetImage("images/${imgs[index]}"),
+                                    AssetImage("images/${imgs[index]}"),
                                   ),
                                   title: Text(
                                     "Dr. Docker",
@@ -266,16 +267,21 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     ),
                   ),
                   ListTile(
-                    leading: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF0EEFA),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.location_on,
-                        color: Color(0xFF7165D6),
-                        size: 30,
+                    leading: GestureDetector(
+                      onTap: () {
+                        _openMaps();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF0EEFA),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.location_on,
+                          color: Color(0xFF7165D6),
+                          size: 30,
+                        ),
                       ),
                     ),
                     title: Text(
@@ -474,5 +480,20 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       backgroundColor: color,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _openMaps() async {
+    const String address = ''; // Addressed à afficher dans Maps
+    final Uri googleMapsUri = Uri(
+      scheme: 'https',
+      host: 'www.google.com',
+      path: 'maps/search/',
+      queryParameters: {'q': address},
+    );
+    if (await canLaunch(googleMapsUri.toString())) {
+      await launch(googleMapsUri.toString());
+    } else {
+      _showSnackbar(context, "Impossible d'ouvrir Maps", Colors.red);
+    }
   }
 }

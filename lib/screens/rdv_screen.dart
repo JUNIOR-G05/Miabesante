@@ -73,8 +73,10 @@ class _RdvState extends State<Rdv> {
                             icon: Icon(Icons.edit, color: Colors.blue),
                             onPressed: (
 
+
                                 ) {
-                              // _showEditRdvDialog(context, rdv);
+
+                               _showEditRdvDialog(context, rdv);
                             },
                           ),
                           IconButton(
@@ -366,6 +368,119 @@ class _RdvState extends State<Rdv> {
       content: Text(message),
       backgroundColor: color,
     );
+
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  Future<void> _showEditRdvDialog(BuildContext context, RdvModel rdv) async {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController causeController = TextEditingController(text: rdv.cause);
+    final TextEditingController dateController = TextEditingController(text: rdv.date);
+    final TextEditingController heureController = TextEditingController(text: rdv.heure);
+    final TextEditingController lieuController = TextEditingController(text: rdv.lieu);
+    final TextEditingController nomPatientController = TextEditingController(text: rdv.nomPatient);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Modifier le RDV"),
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: causeController,
+                    decoration: InputDecoration(labelText: "Cause"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer la cause";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: dateController,
+                    decoration: InputDecoration(labelText: "Date"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer la date";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: heureController,
+                    decoration: InputDecoration(labelText: "Heure"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer l'heure";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: lieuController,
+                    decoration: InputDecoration(labelText: "Lieu"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer le lieu";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: nomPatientController,
+                    decoration: InputDecoration(labelText: "Nom du Patient"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer le nom du patient";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Annuler"),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  RdvModel updatedRdv = RdvModel(
+                    id: rdv.id,
+                    cause: causeController.text,
+                    docteurId: rdv.docteurId,
+                    date: dateController.text,
+                    heure: heureController.text,
+                    lieu: lieuController.text,
+                    patientId: rdv.patientId,
+                    nomPatient: nomPatientController.text,
+                  );
+                  try {
+                    await _rdvService.updateRdv(rdv.id, updatedRdv);
+                    Navigator.pop(context);
+                    _showSnackbar(context, "RDV modifié avec succès", Colors.green);
+                  } catch (e) {
+                    _showSnackbar(context, "Erreur lors de la modification du RDV", Colors.red);
+                  }
+                }
+              },
+              child: Text("Modifier"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 }

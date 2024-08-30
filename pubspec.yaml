@@ -42,6 +42,7 @@ dependencies:
   cloud_firestore: ^5.0.2
   flutter_native_splash: ^2.4.0
   shared_preferences: ^2.2.3
+  url_launcher: ^6.3.0
 
 flutter_native_splash:
   background_image: assets/heart.png

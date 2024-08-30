@@ -13,7 +13,7 @@ class _NoteState extends State<Note> {
   Widget build(BuildContext context) {
     return  Scaffold(
       body: Center(
-        child: Text("Note"),
+        child: Text("Note "),
       ),
     );
   }
